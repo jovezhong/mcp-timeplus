@@ -2,11 +2,11 @@ import logging
 import os
 from typing import Sequence
 
-import clickhouse_connect
+import timeplus_connect
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
-MCP_SERVER_NAME = "mcp-clickhouse"
+MCP_SERVER_NAME = "mcp-timeplus"
 
 # Configure logging
 logging.basicConfig(
@@ -17,7 +17,7 @@ logger = logging.getLogger(MCP_SERVER_NAME)
 load_dotenv()
 
 deps = [
-    "clickhouse-connect",
+    "timeplus-connect",
     "python-dotenv",
     "uvicorn",
 ]
@@ -28,7 +28,7 @@ mcp = FastMCP(MCP_SERVER_NAME, dependencies=deps)
 @mcp.tool()
 def list_databases():
     logger.info("Listing all databases")
-    client = create_clickhouse_client()
+    client = create_timeplus_client()
     result = client.command("SHOW DATABASES")
     logger.info(f"Found {len(result) if isinstance(result, list) else 1} databases")
     return result
@@ -37,15 +37,15 @@ def list_databases():
 @mcp.tool()
 def list_tables(database: str, like: str = None):
     logger.info(f"Listing tables in database '{database}'")
-    client = create_clickhouse_client()
-    query = f"SHOW TABLES FROM {database}"
+    client = create_timeplus_client()
+    query = f"SHOW STREAMS FROM {database}"
     if like:
         query += f" LIKE '{like}'"
     result = client.command(query)
 
     def get_table_info(table):
         logger.info(f"Getting schema info for table {database}.{table}")
-        schema_query = f"DESCRIBE TABLE {database}.`{table}`"
+        schema_query = f"DESCRIBE STREAM {database}.`{table}`"
         schema_result = client.query(schema_query)
 
         columns = []
@@ -56,7 +56,7 @@ def list_tables(database: str, like: str = None):
                 column_dict[col_name] = row[i]
             columns.append(column_dict)
 
-        create_table_query = f"SHOW CREATE TABLE {database}.`{table}`"
+        create_table_query = f"SHOW CREATE STREAM {database}.`{table}`"
         create_table_result = client.command(create_table_query)
 
         return {
@@ -84,7 +84,7 @@ def list_tables(database: str, like: str = None):
 @mcp.tool()
 def run_select_query(query: str):
     logger.info(f"Executing SELECT query: {query}")
-    client = create_clickhouse_client()
+    client = create_timeplus_client()
     try:
         res = client.query(query, settings={"readonly": 1})
         column_names = res.column_names
@@ -101,14 +101,14 @@ def run_select_query(query: str):
         return f"error running query: {err}"
 
 
-def create_clickhouse_client():
-    host = os.getenv("CLICKHOUSE_HOST")
-    port = os.getenv("CLICKHOUSE_PORT")
-    username = os.getenv("CLICKHOUSE_USER")
-    logger.info(f"Creating ClickHouse client connection to {host}:{port} as {username}")
-    return clickhouse_connect.get_client(
+def create_timeplus_client():
+    host = os.getenv("TIMEPLUS_HOST")
+    port = os.getenv("TIMEPLUS_PORT")
+    username = os.getenv("TIMEPLUS_USER")
+    logger.info(f"Creating Timeplus client connection to {host}:{port} as {username}")
+    return timeplus_connect.get_client(
         host=host,
         port=port,
         username=username,
-        password=os.getenv("CLICKHOUSE_PASSWORD"),
+        password=os.getenv("TIMEPLUS_PASSWORD"),
     )
