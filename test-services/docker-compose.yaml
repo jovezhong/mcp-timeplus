@@ -1,15 +1,15 @@
 services:
-  clickhouse:
-    image: clickhouse/clickhouse-server:latest
+  timeplus:
+    image: d.timeplus.com/timeplus-io/proton:latest
     ports:
       - "8123:8123"
-      - "9000:9000"
+      - "8463:8463"
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
+      - timeplus-data:/var/lib/timeplusd
     environment:
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=clickhouse
-      - CLICKHOUSE_DB=default
+      - TIMEPLUS_USER=default
+      - TIMEPLUS_PASSWORD=
+      - TIMEPLUS_DB=default
 
 volumes:
-  clickhouse-data:
+  timeplus-data:

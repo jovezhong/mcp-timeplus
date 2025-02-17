@@ -1,7 +1,7 @@
 [project]
-name = "mcp-clickhouse"
+name = "mcp-timeplus"
 version = "0.1.0"
-description = "An MCP server for ClickHouse."
+description = "An MCP server for Timeplus."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
@@ -11,14 +11,14 @@ dependencies = [
      "python-dotenv>=1.0.1",
      "fastmcp>=0.4.0",
      "uvicorn>=0.34.0",
-     "clickhouse-connect>=0.8.0",
+     "timeplus-connect>=0.8.14",
 ]
 
 [project.scripts]
-mcp-clickhouse = "mcp_clickhouse.main:main"
+mcp-timeplus = "mcp_timeplus.main:main"
 
 [project.urls]
-Home = "https://github.com/iskakaushik/mcp-clickhouse"
+Home = "https://github.com/jovezhong/mcp-timeplus"
 
 [project.optional-dependencies]
 dev = [
@@ -27,7 +27,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["mcp_clickhouse"]
+packages = ["mcp_timeplus"]
 
 [tool.ruff]
 line-length = 100

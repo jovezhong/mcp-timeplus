@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - timeplus
   pull_request:
 
 jobs:
@@ -11,10 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      clickhouse:
-        image: clickhouse/clickhouse-server:24.10
+      timeplus:
+        image: d.timeplus.com/timeplus-io/proton:latest
         ports:
-          - 9000:9000
           - 8123:8123
 
     steps:
@@ -32,10 +31,10 @@ jobs:
 
       - name: Run tests
         env:
-          CLICKHOUSE_HOST: "localhost"
-          CLICKHOUSE_PORT: "8123"
-          CLICKHOUSE_USER: "default"
-          CLICKHOUSE_PASSWORD: ""
+          TIMEPLUS_HOST: "localhost"
+          TIMEPLUS_PORT: "8123"
+          TIMEPLUS_USER: "default"
+          TIMEPLUS_PASSWORD: ""
         run: |
           uv run pytest tests
 
