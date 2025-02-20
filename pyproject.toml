@@ -13,6 +13,7 @@ dependencies = [
     "uvicorn>=0.34.0",
     "timeplus-connect>=0.8.15",
     "confluent-kafka",
+    "pip-system-certs>=4.0",
 ]
 
 [project.scripts]
