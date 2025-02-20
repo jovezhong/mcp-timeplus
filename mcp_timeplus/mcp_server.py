@@ -108,7 +108,7 @@ def create_timeplus_client():
         f"as {client_config['username']} "
         f"(secure={client_config['secure']}, verify={client_config['verify']}, "
         f"connect_timeout={client_config['connect_timeout']}s, "
-        f"send_receive_timeout={client_config['send_receive_timeout']}s)"
+        f"send_receive_timeout={client_config['send_receive_timeout']}s)")
 
     try:
         client = timeplus_connect.get_client(**client_config)

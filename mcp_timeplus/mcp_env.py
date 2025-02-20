@@ -127,9 +127,6 @@ class TimeplusConfig:
             ValueError: If any required environment variable is missing.
         """
         missing_vars = []
-        for var in ["TIMEPLUS_HOST", "TIMEPLUS_USER", "TIMEPLUS_PASSWORD"]:
-            if var not in os.environ:
-                missing_vars.append(var)
 
         if missing_vars:
             raise ValueError(
