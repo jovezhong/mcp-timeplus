@@ -3,7 +3,7 @@
 
 An MCP server for Timeplus.
 
-<a href="https://glama.ai/mcp/servers/yvjy4csvo1"><img width="380" height="200" src="https://glama.ai/mcp/servers/yvjy4csvo1/badge" alt="mcp-timeplus MCP server" /></a>
+<a href="https://glama.ai/mcp/servers/9aleefsq9s"><img width="380" height="200" src="https://glama.ai/mcp/servers/9aleefsq9s/badge" alt="mcp-timeplus MCP server" /></a>
 
 ## Features
 
@@ -25,8 +25,6 @@ An MCP server for Timeplus.
 
 First, ensure you have the `uv` executable installed. If not, you can install it by following the instructions [here](https://docs.astral.sh/uv/).
 
-This Python package is not published to PyPI yet. Please clone this repo and run `uv sync` to install the dependencies.
-
 1. Open the Claude Desktop configuration file located at:
    - On macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
    - On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
@@ -37,20 +35,17 @@ This Python package is not published to PyPI yet. Please clone this repo and run
 {
   "mcpServers": {
     "mcp-timeplus": {
-      "command": "/path/to/uv",
-      "args": [
-        "run",
-        "--project",
-        "/path/to/repo/mcp-timeplus",
-        "--python",
-        "3.13",
-        "mcp-timeplus"
-      ],
+      "command": "uvx",
+      "args": ["mcp-timeplus"],
       "env": {
         "TIMEPLUS_HOST": "<timeplus-host>",
         "TIMEPLUS_PORT": "<timeplus-port>",
         "TIMEPLUS_USER": "<timeplus-user>",
-        "TIMEPLUS_PASSWORD": "<timeplus-password>"
+        "TIMEPLUS_PASSWORD": "<timeplus-password>",
+        "TIMEPLUS_SECURE": "false",
+        "TIMEPLUS_VERIFY": "true",
+        "TIMEPLUS_CONNECT_TIMEOUT": "30",
+        "TIMEPLUS_SEND_RECEIVE_TIMEOUT": "30"
       }
     }
   }
@@ -59,33 +54,9 @@ This Python package is not published to PyPI yet. Please clone this repo and run
 
 Update the environment variables to point to your own Timeplus service.
 
-3. Locate the command entry for `uv` and replace it with the absolute path to the `uv` executable. This ensures that the correct version of `uv` is used when starting the server. Also point to the absolute path to the `mcp-timeplus` directory. A sample configuration:
+3. Restart Claude Desktop to apply the changes.
 
-```json
-{
-  "mcpServers": {
-    "mcp-timeplus": {
-      "command": "/opt/homebrew/bin/uv",
-      "args": [
-        "run",
-        "--project",
-        "/Users/jove/Dev/mcp-timeplus",
-        "--python",
-        "3.13",
-        "mcp-timeplus"
-      ],
-      "env": {
-        "TIMEPLUS_HOST": "localhost",
-        "TIMEPLUS_PORT": "8123",
-        "TIMEPLUS_USER": "default",
-        "TIMEPLUS_PASSWORD": ""
-      }
-    }
-  }
-}
-```
-
-4. Restart Claude Desktop to apply the changes.
+You can also try this MCP server with other MCP clients, such as [5ire](https://github.com/nanbingxyz/5ire).
 
 ## Development
 
@@ -98,8 +69,41 @@ TIMEPLUS_HOST=localhost
 TIMEPLUS_PORT=8123
 TIMEPLUS_USER=default
 TIMEPLUS_PASSWORD=
+TIMEPLUS_SECURE=false
+TIMEPLUS_VERIFY=true
+TIMEPLUS_CONNECT_TIMEOUT=30
+TIMEPLUS_SEND_RECEIVE_TIMEOUT=30
 ```
 
 3. Run `uv sync` to install the dependencies. Then do `source .venv/bin/activate`.
 
 4. For easy testing, you can run `fastmcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools: list_databases, list_tables, run_selected_query.
+
+### Environment Variables
+
+The following environment variables are used to configure the Timeplus connection:
+
+#### Required Variables
+* `TIMEPLUS_HOST`: The hostname of your Timeplus server
+* `TIMEPLUS_USER`: The username for authentication
+* `TIMEPLUS_PASSWORD`: The password for authentication
+
+#### Optional Variables
+* `TIMEPLUS_PORT`: The port number of your Timeplus server
+  - Default: `8443` if HTTPS is enabled, `8123` if disabled
+  - Usually doesn't need to be set unless using a non-standard port
+* `TIMEPLUS_SECURE`: Enable/disable HTTPS connection
+  - Default: `"false"`
+  - Set to `"true"` for secure connections
+* `TIMEPLUS_VERIFY`: Enable/disable SSL certificate verification
+  - Default: `"true"`
+  - Set to `"false"` to disable certificate verification (not recommended for production)
+* `TIMEPLUS_CONNECT_TIMEOUT`: Connection timeout in seconds
+  - Default: `"30"`
+  - Increase this value if you experience connection timeouts
+* `TIMEPLUS_SEND_RECEIVE_TIMEOUT`: Send/receive timeout in seconds
+  - Default: `"300"`
+  - Increase this value for long-running queries
+* `TIMEPLUS_DATABASE`: Default database to use
+  - Default: None (uses server default)
+  - Set this to automatically connect to a specific database
