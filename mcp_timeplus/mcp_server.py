@@ -108,7 +108,8 @@ def run_select_query(query: str):
     logger.info(f"Executing SELECT query: {query}")
     client = create_timeplus_client()
     try:
-        res = client.query(query, settings={"readonly": 1})
+        readonly = 1 if config.readonly else 0
+        res = client.query(query, settings={"readonly": readonly})
         column_names = res.column_names
         rows = []
         for row in res.result_rows:

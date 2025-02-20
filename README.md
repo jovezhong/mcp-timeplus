@@ -12,7 +12,7 @@ An MCP server for Timeplus.
 * `run_select_query`
   - Execute SQL queries on your Timeplus cluster.
   - Input: `sql` (string): The SQL query to execute.
-  - All Timeplus queries are run with `readonly = 1` to ensure they are safe.
+  - By default, all Timeplus queries are run with `readonly = 1` to ensure they are safe. If you want to run DDL or DML queries, you can set the environment variable `TIMEPLUS_READ_ONLY` to `false`.
 
 * `list_databases`
   - List all databases on your Timeplus cluster.
@@ -45,7 +45,8 @@ First, ensure you have the `uv` executable installed. If not, you can install it
         "TIMEPLUS_SECURE": "false",
         "TIMEPLUS_VERIFY": "true",
         "TIMEPLUS_CONNECT_TIMEOUT": "30",
-        "TIMEPLUS_SEND_RECEIVE_TIMEOUT": "30"
+        "TIMEPLUS_SEND_RECEIVE_TIMEOUT": "30",
+        "TIMEPLUS_READ_ONLY": "true"
       }
     }
   }
@@ -73,6 +74,7 @@ TIMEPLUS_SECURE=false
 TIMEPLUS_VERIFY=true
 TIMEPLUS_CONNECT_TIMEOUT=30
 TIMEPLUS_SEND_RECEIVE_TIMEOUT=30
+TIMEPLUS_READ_ONLY=true
 ```
 
 3. Run `uv sync` to install the dependencies. Then do `source .venv/bin/activate`.
@@ -107,3 +109,6 @@ The following environment variables are used to configure the Timeplus connectio
 * `TIMEPLUS_DATABASE`: Default database to use
   - Default: None (uses server default)
   - Set this to automatically connect to a specific database
+* `TIMEPLUS_READ_ONLY`: Enable/disable read-only mode
+  - Default: `"true"`
+  - Set to `"false"` to enable DDL/DML
