@@ -19,7 +19,7 @@ class TestTimeplusTools(unittest.TestCase):
         cls.client.command(f"CREATE DATABASE IF NOT EXISTS {cls.test_db}")
 
         # Drop table if exists to ensure clean state
-        cls.client.command(f"DROP TABLE IF EXISTS {cls.test_db}.{cls.test_table}")
+        cls.client.command(f"DROP STREAM IF EXISTS {cls.test_db}.{cls.test_table}")
 
         # Create table with comments
         cls.client.command(f"""
