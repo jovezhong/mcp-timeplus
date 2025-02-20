@@ -1,17 +1,17 @@
 [project]
 name = "mcp-timeplus"
-version = "0.1.0"
+version = "0.1.2"
 description = "An MCP server for Timeplus."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = [
-     "mcp>=1.0.0",
-     "python-dotenv>=1.0.1",
-     "fastmcp>=0.4.0",
-     "uvicorn>=0.34.0",
-     "timeplus-connect>=0.8.14",
+    "mcp>=1.0.0",
+    "python-dotenv>=1.0.1",
+    "fastmcp>=0.4.0",
+    "uvicorn>=0.34.0",
+    "timeplus-connect>=0.8.14",
 ]
 
 [project.scripts]
@@ -21,10 +21,7 @@ mcp-timeplus = "mcp_timeplus.main:main"
 Home = "https://github.com/jovezhong/mcp-timeplus"
 
 [project.optional-dependencies]
-dev = [
-    "ruff",
-    "pytest"
-]
+dev = ["ruff", "pytest"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["mcp_timeplus"]
