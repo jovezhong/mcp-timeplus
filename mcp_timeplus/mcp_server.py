@@ -2,6 +2,7 @@ import logging
 from typing import Sequence
 
 import timeplus_connect
+from timeplus_connect.driver.binding import quote_identifier, format_query_value
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
@@ -38,18 +39,18 @@ def list_databases():
 def list_tables(database: str, like: str = None):
     logger.info(f"Listing tables in database '{database}'")
     client = create_timeplus_client()
-    query = f"SHOW STREAMS FROM {database}"
+    query = f"SHOW STREAMS FROM {quote_identifier(database)}"
     if like:
-        query += f" LIKE '{like}'"
+        query += f" LIKE {format_query_value(like)}"
     result = client.command(query)
 
     # Get all table comments in one query
-    table_comments_query = f"SELECT name, comment FROM system.tables WHERE database = '{database}'"
+    table_comments_query = f"SELECT name, comment FROM system.tables WHERE database = {format_query_value(database)}"
     table_comments_result = client.query(table_comments_query)
     table_comments = {row[0]: row[1] for row in table_comments_result.result_rows}
 
     # Get all column comments in one query
-    column_comments_query = f"SELECT table, name, comment FROM system.columns WHERE database = '{database}'"
+    column_comments_query = f"SELECT table, name, comment FROM system.columns WHERE database = {format_query_value(database)}"
     column_comments_result = client.query(column_comments_query)
     column_comments = {}
     for row in column_comments_result.result_rows:
@@ -60,7 +61,7 @@ def list_tables(database: str, like: str = None):
 
     def get_table_info(table):
         logger.info(f"Getting schema info for table {database}.{table}")
-        schema_query = f"DESCRIBE STREAM {database}.`{table}`"
+        schema_query = f"DESCRIBE STREAM {quote_identifier(database)}.{quote_identifier(table)}"
         schema_result = client.query(schema_query)
 
         columns = []
