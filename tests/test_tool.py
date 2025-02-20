@@ -7,14 +7,14 @@ from mcp_timeplus import create_timeplus_client, list_databases, list_tables, ru
 load_dotenv()
 
 
-class TestClickhouseTools(unittest.TestCase):
+class TestTimeplusTools(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the environment before tests."""
         cls.client = create_timeplus_client()
 
         # Prepare test database and table
-        cls.test_db = "test_tool_db"
+        cls.test_db = "default"
         cls.test_table = "test_table"
         cls.client.command(f"CREATE DATABASE IF NOT EXISTS {cls.test_db}")
         cls.client.command(f"""
