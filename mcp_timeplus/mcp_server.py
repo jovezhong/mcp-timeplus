@@ -43,6 +43,21 @@ def list_tables(database: str, like: str = None):
         query += f" LIKE '{like}'"
     result = client.command(query)
 
+    # Get all table comments in one query
+    table_comments_query = f"SELECT name, comment FROM system.tables WHERE database = '{database}'"
+    table_comments_result = client.query(table_comments_query)
+    table_comments = {row[0]: row[1] for row in table_comments_result.result_rows}
+
+    # Get all column comments in one query
+    column_comments_query = f"SELECT table, name, comment FROM system.columns WHERE database = '{database}'"
+    column_comments_result = client.query(column_comments_query)
+    column_comments = {}
+    for row in column_comments_result.result_rows:
+        table, col_name, comment = row
+        if table not in column_comments:
+            column_comments[table] = {}
+        column_comments[table][col_name] = comment
+
     def get_table_info(table):
         logger.info(f"Getting schema info for table {database}.{table}")
         schema_query = f"DESCRIBE STREAM {database}.`{table}`"
@@ -54,6 +69,11 @@ def list_tables(database: str, like: str = None):
             column_dict = {}
             for i, col_name in enumerate(column_names):
                 column_dict[col_name] = row[i]
+            # Add comment from our pre-fetched comments
+            if table in column_comments and column_dict['name'] in column_comments[table]:
+                column_dict['comment'] = column_comments[table][column_dict['name']]
+            else:
+                column_dict['comment'] = None
             columns.append(column_dict)
 
         create_table_query = f"SHOW CREATE STREAM {database}.`{table}`"
@@ -62,6 +82,7 @@ def list_tables(database: str, like: str = None):
         return {
             "database": database,
             "name": table,
+            "comment": table_comments.get(table),
             "columns": columns,
             "create_table_query": create_table_result,
         }
@@ -108,7 +129,8 @@ def create_timeplus_client():
         f"as {client_config['username']} "
         f"(secure={client_config['secure']}, verify={client_config['verify']}, "
         f"connect_timeout={client_config['connect_timeout']}s, "
-        f"send_receive_timeout={client_config['send_receive_timeout']}s)")
+        f"send_receive_timeout={client_config['send_receive_timeout']}s)"
+    )
 
     try:
         client = timeplus_connect.get_client(**client_config)
