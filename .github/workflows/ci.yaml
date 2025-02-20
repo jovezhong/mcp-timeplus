@@ -35,6 +35,8 @@ jobs:
           TIMEPLUS_PORT: "8123"
           TIMEPLUS_USER: "default"
           TIMEPLUS_PASSWORD: ""
+          TIMEPLUS_SECURE: "false"
+          TIMEPLUS_VERIFY: "false"
         run: |
           uv run pytest tests
 
