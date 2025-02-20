@@ -2,7 +2,7 @@ import unittest
 
 from dotenv import load_dotenv
 
-from mcp_clickhouse import create_clickhouse_client, list_databases, list_tables, run_select_query
+from mcp_timeplus import create_timeplus_client, list_databases, list_tables, run_select_query
 
 load_dotenv()
 
@@ -11,18 +11,17 @@ class TestClickhouseTools(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the environment before tests."""
-        cls.client = create_clickhouse_client()
+        cls.client = create_timeplus_client()
 
         # Prepare test database and table
         cls.test_db = "test_tool_db"
         cls.test_table = "test_table"
         cls.client.command(f"CREATE DATABASE IF NOT EXISTS {cls.test_db}")
         cls.client.command(f"""
-            CREATE TABLE IF NOT EXISTS {cls.test_db}.{cls.test_table} (
-                id UInt32,
-                name String
-            ) ENGINE = MergeTree()
-            ORDER BY id
+            CREATE STREAM IF NOT EXISTS {cls.test_db}.{cls.test_table} (
+                id uint32,
+                name string
+            )
         """)
         cls.client.command(f"""
             INSERT INTO {cls.test_db}.{cls.test_table} (id, name) VALUES (1, 'Alice'), (2, 'Bob')
