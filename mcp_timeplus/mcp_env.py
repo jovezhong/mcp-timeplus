@@ -28,6 +28,7 @@ class TimeplusConfig:
         TIMEPLUS_CONNECT_TIMEOUT: Connection timeout in seconds (default: 30)
         TIMEPLUS_SEND_RECEIVE_TIMEOUT: Send/receive timeout in seconds (default: 300)
         TIMEPLUS_DATABASE: Default database to use (default: default)
+        TIMEPLUS_READ_ONLY: Enable read-only mode (default: true)
     """
 
     def __init__(self):
@@ -96,6 +97,14 @@ class TimeplusConfig:
         Default: 300 (Timeplus default)
         """
         return int(os.getenv("TIMEPLUS_SEND_RECEIVE_TIMEOUT", "300"))
+
+    @property
+    def readonly(self) -> bool:
+        """Get whether only read-only SQL is enabled.
+
+        Default: true
+        """
+        return os.getenv("TIMEPLUS_READ_ONLY", "true").lower() == "true"
 
     def get_client_config(self) -> dict:
         """Get the configuration dictionary for timeplus_connect client.
