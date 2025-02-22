@@ -9,6 +9,8 @@ from fastmcp import FastMCP
 MCP_SERVER_NAME = "mcp-timeplus"
 from mcp_timeplus.mcp_env import config
 
+from confluent_kafka.admin import (AdminClient)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -21,6 +23,7 @@ deps = [
     "timeplus-connect",
     "python-dotenv",
     "uvicorn",
+    "confluent-kafka",
 ]
 
 mcp = FastMCP(MCP_SERVER_NAME, dependencies=deps)
@@ -123,6 +126,21 @@ def run_select_query(query: str):
         logger.error(f"Error executing query: {err}")
         return f"error running query: {err}"
 
+@mcp.tool()
+def list_kafka_topics():
+    logger.info("Listing all topics in the Kafka cluster")
+    brokers = 'kafka-public-read-timeplus.a.aivencloud.com:28864'
+    sasl_mechanism = 'SCRAM-SHA-256'
+    sasl_plain_username = "avnadmin"
+    sasl_plain_password = ".."
+    security_protocol="SASL_SSL"
+    conf = {'bootstrap.servers':brokers, 'sasl.mechanism':sasl_mechanism,
+            'sasl.username':sasl_plain_username, 'sasl.password':sasl_plain_password,
+            'security.protocol':security_protocol,'enable.ssl.certificate.verification':'false'}
+    admin_client = AdminClient(conf)
+    topics =admin_client.list_topics(timeout=10).topics
+    logger.info(f"Found {len(topics) if isinstance(topics, list) else 1} topics")
+    return topics
 
 def create_timeplus_client():
     client_config = config.get_client_config()
