@@ -9,7 +9,7 @@ from fastmcp import FastMCP
 MCP_SERVER_NAME = "mcp-timeplus"
 from mcp_timeplus.mcp_env import config
 
-import json, os
+import json, os, time
 from confluent_kafka.admin import (AdminClient)
 from confluent_kafka import Consumer
 
@@ -139,7 +139,9 @@ def list_kafka_topics():
 @mcp.tool()
 def explore_kafka_topic(topic: str, message_count: int = 1):
     logger.info(f"Consuming topic {topic}")
-    client = Consumer(json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG']))
+    conf = json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG'])
+    conf['group.id'] = f"mcp-{time.time()}"
+    client = Consumer(conf)
     client.subscribe([topic])
     messages = []
     for i in range(message_count):
