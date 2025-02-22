@@ -109,7 +109,7 @@ def list_tables(database: str, like: str = None):
 
 
 @mcp.tool()
-def run_select_query(query: str):
+def run_sql(query: str):
     logger.info(f"Executing SELECT query: {query}")
     client = create_timeplus_client()
     try:

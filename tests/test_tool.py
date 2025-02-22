@@ -2,7 +2,7 @@ import unittest
 
 from dotenv import load_dotenv
 
-from mcp_timeplus import create_timeplus_client, list_databases, list_tables, run_select_query
+from mcp_timeplus import create_timeplus_client, list_databases, list_tables, run_sql
 
 load_dotenv()
 
@@ -60,7 +60,7 @@ class TestTimeplusTools(unittest.TestCase):
     def test_run_select_query_success(self):
         """Test running a SELECT query successfully."""
         query = f"SELECT * FROM {self.test_db}.{self.test_table}"
-        result = run_select_query(query)
+        result = run_sql(query)
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]["id"], 1)
@@ -69,7 +69,7 @@ class TestTimeplusTools(unittest.TestCase):
     def test_run_select_query_failure(self):
         """Test running a SELECT query with an error."""
         query = f"SELECT * FROM {self.test_db}.non_existent_table"
-        result = run_select_query(query)
+        result = run_sql(query)
         self.assertIsInstance(result, str)
         self.assertIn("error running query", result)
 

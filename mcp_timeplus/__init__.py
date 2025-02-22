@@ -2,7 +2,7 @@ from .mcp_server import (
     create_timeplus_client,
     list_databases,
     list_tables,
-    run_select_query,
+    run_sql,
     list_kafka_topics,
     explore_kafka_topic,
 )
@@ -10,7 +10,7 @@ from .mcp_server import (
 __all__ = [
     "list_databases",
     "list_tables",
-    "run_select_query",
+    "run_sql",
     "create_timeplus_client",
     "list_kafka_topics",
     "explore_kafka_topic",
