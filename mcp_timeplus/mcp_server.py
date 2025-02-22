@@ -11,6 +11,7 @@ from mcp_timeplus.mcp_env import config
 
 import json, os
 from confluent_kafka.admin import (AdminClient)
+from confluent_kafka import Consumer
 
 # Configure logging
 logging.basicConfig(
@@ -134,6 +135,27 @@ def list_kafka_topics():
     topics = admin_client.list_topics(timeout=10).topics
     logger.info(f"Found {len(topics) if isinstance(topics, dict) else 1} topics")
     return topics
+
+@mcp.tool()
+def explore_kafka_topic(topic: str, message_count: int = 1):
+    logger.info(f"Consuming topic {topic}")
+    client = Consumer(json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG']))
+    client.subscribe([topic])
+    messages = []
+    for i in range(message_count):
+        logger.info(f"Consuming message {i+1}")
+        message = client.poll()
+        if message is None:
+            logger.info("No message received")
+            continue
+        if message.error():
+            logger.error(f"Error consuming message: {message.error()}")
+            continue
+        else:
+            logger.info(f"Received message {i+1}")
+            messages.append(json.loads(message.value()))
+    client.close()
+    return messages
 
 def create_timeplus_client():
     client_config = config.get_client_config()

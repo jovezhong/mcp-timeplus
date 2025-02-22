@@ -4,6 +4,7 @@ from .mcp_server import (
     list_tables,
     run_select_query,
     list_kafka_topics,
+    explore_kafka_topic,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "run_select_query",
     "create_timeplus_client",
     "list_kafka_topics",
+    "explore_kafka_topic",
 ]
