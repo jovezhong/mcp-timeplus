@@ -9,7 +9,7 @@ An MCP server for Timeplus.
 
 ### Tools
 
-* `run_select_query`
+* `run_sql`
   - Execute SQL queries on your Timeplus cluster.
   - Input: `sql` (string): The SQL query to execute.
   - By default, all Timeplus queries are run with `readonly = 1` to ensure they are safe. If you want to run DDL or DML queries, you can set the environment variable `TIMEPLUS_READ_ONLY` to `false`.
@@ -20,6 +20,17 @@ An MCP server for Timeplus.
 * `list_tables`
   - List all tables in a database.
   - Input: `database` (string): The name of the database.
+
+* `list_kafka_topics`
+  - List all topics in a Kafka cluster
+
+* `explore_kafka_topic`
+  - Show some messages in the Kafka topic
+  - Input: `topic` (string): The name of the topic. `message_count` (int): The number of messages to show, default to 1.
+
+* `create_kafka_stream`
+  - Setup a streaming ETL in Timeplus to save the Kafka messages locally
+  - Input: `topic` (string): The name of the topic.
 
 ## Configuration
 
@@ -46,7 +57,8 @@ First, ensure you have the `uv` executable installed. If not, you can install it
         "TIMEPLUS_VERIFY": "true",
         "TIMEPLUS_CONNECT_TIMEOUT": "30",
         "TIMEPLUS_SEND_RECEIVE_TIMEOUT": "30",
-        "TIMEPLUS_READ_ONLY": "true"
+        "TIMEPLUS_READ_ONLY": "false",
+        "TIMEPLUS_KAFKA_CONFIG": "{\"bootstrap.servers\":\"a.aivencloud.com:28864\", \"sasl.mechanism\":\"SCRAM-SHA-256\",\"sasl.username\":\"avnadmin\", \"sasl.password\":\"thePassword\",\"security.protocol\":\"SASL_SSL\",\"enable.ssl.certificate.verification\":\"false\"}"
       }
     }
   }
@@ -74,12 +86,13 @@ TIMEPLUS_SECURE=false
 TIMEPLUS_VERIFY=true
 TIMEPLUS_CONNECT_TIMEOUT=30
 TIMEPLUS_SEND_RECEIVE_TIMEOUT=30
-TIMEPLUS_READ_ONLY=true
+TIMEPLUS_READ_ONLY=false
+TIMEPLUS_KAFKA_CONFIG={"bootstrap.servers":"a.aivencloud.com:28864", "sasl.mechanism":"SCRAM-SHA-256","sasl.username":"avnadmin", "sasl.password":"thePassword","security.protocol":"SASL_SSL","enable.ssl.certificate.verification":"false"}
 ```
 
 3. Run `uv sync` to install the dependencies. Then do `source .venv/bin/activate`.
 
-4. For easy testing, you can run `fastmcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools: list_databases, list_tables, run_selected_query.
+4. For easy testing, you can run `fastmcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools.
 
 ### Environment Variables
 
@@ -112,3 +125,4 @@ The following environment variables are used to configure the Timeplus connectio
 * `TIMEPLUS_READ_ONLY`: Enable/disable read-only mode
   - Default: `"true"`
   - Set to `"false"` to enable DDL/DML
+* `TIMEPLUS_KAFKA_CONFIG`: A JSON string for the Kafka configuration. Please refer to [librdkafka configuration](https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md) or take the above example as a reference.
