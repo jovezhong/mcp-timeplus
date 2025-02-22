@@ -9,6 +9,10 @@ from fastmcp import FastMCP
 MCP_SERVER_NAME = "mcp-timeplus"
 from mcp_timeplus.mcp_env import config
 
+import json, os, time
+from confluent_kafka.admin import (AdminClient)
+from confluent_kafka import Consumer
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -21,6 +25,7 @@ deps = [
     "timeplus-connect",
     "python-dotenv",
     "uvicorn",
+    "confluent-kafka",
 ]
 
 mcp = FastMCP(MCP_SERVER_NAME, dependencies=deps)
@@ -36,7 +41,7 @@ def list_databases():
 
 
 @mcp.tool()
-def list_tables(database: str, like: str = None):
+def list_tables(database: str = 'default', like: str = None):
     logger.info(f"Listing tables in database '{database}'")
     client = create_timeplus_client()
     query = f"SHOW STREAMS FROM {quote_identifier(database)}"
@@ -104,8 +109,8 @@ def list_tables(database: str, like: str = None):
 
 
 @mcp.tool()
-def run_select_query(query: str):
-    logger.info(f"Executing SELECT query: {query}")
+def run_sql(query: str):
+    logger.info(f"Executing query: {query}")
     client = create_timeplus_client()
     try:
         readonly = 1 if config.readonly else 0
@@ -123,6 +128,56 @@ def run_select_query(query: str):
         logger.error(f"Error executing query: {err}")
         return f"error running query: {err}"
 
+@mcp.tool()
+def list_kafka_topics():
+    logger.info("Listing all topics in the Kafka cluster")
+    admin_client = AdminClient(json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG']))
+    topics = admin_client.list_topics(timeout=10).topics
+    topics_array = []
+    for topic, detail in topics.items():
+        topic_info = {"topic": topic, "partitions": len(detail.partitions)}
+        topics_array.append(topic_info)
+    return topics_array
+
+@mcp.tool()
+def explore_kafka_topic(topic: str, message_count: int = 1):
+    logger.info(f"Consuming topic {topic}")
+    conf = json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG'])
+    conf['group.id'] = f"mcp-{time.time()}"
+    client = Consumer(conf)
+    client.subscribe([topic])
+    messages = []
+    for i in range(message_count):
+        logger.info(f"Consuming message {i+1}")
+        message = client.poll()
+        if message is None:
+            logger.info("No message received")
+            continue
+        if message.error():
+            logger.error(f"Error consuming message: {message.error()}")
+            continue
+        else:
+            logger.info(f"Received message {i+1}")
+            messages.append(json.loads(message.value()))
+    client.close()
+    return messages
+
+@mcp.tool()
+def create_kafka_stream(topic: str):
+    logger.info(f"Creating Kafka externalstream for topic {topic}")
+    conf = json.loads(os.environ['TIMEPLUS_KAFKA_CONFIG'])
+    ext_stream=f"ext_stream_{topic}"
+    sql=f"""CREATE EXTERNAL STREAM {ext_stream} (raw string)
+    SETTINGS type='kafka',brokers='{conf['bootstrap.servers']}',topic='{topic}',security_protocol='{conf['security.protocol']}',sasl_mechanism='{conf['sasl.mechanism']}',username='{conf['sasl.username']}',password='{conf['sasl.password']}',skip_ssl_cert_check=true
+    """
+    run_sql(sql)
+    logger.info("External Stream created")
+
+    sql=f"CREATE MATERIALIZED VIEW {topic} AS SELECT raw from {ext_stream}"
+    run_sql(sql)
+    logger.info("MATERIALIZED VIEW created")
+
+    return f"Materialized the Kafka data as {topic}"
 
 def create_timeplus_client():
     client_config = config.get_client_config()
