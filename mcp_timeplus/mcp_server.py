@@ -4,7 +4,7 @@ from typing import Sequence
 import timeplus_connect
 from timeplus_connect.driver.binding import quote_identifier, format_query_value
 from dotenv import load_dotenv
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 MCP_SERVER_NAME = "mcp-timeplus"
 from mcp_timeplus.mcp_env import config
