@@ -6,6 +6,7 @@ from .mcp_server import (
     list_kafka_topics,
     explore_kafka_topic,
     create_kafka_stream,
+    generate_sql,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "list_kafka_topics",
     "explore_kafka_topic",
     "create_kafka_stream",
+    "generate_sql",
 ]

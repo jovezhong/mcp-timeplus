@@ -92,7 +92,7 @@ TIMEPLUS_KAFKA_CONFIG={"bootstrap.servers":"a.aivencloud.com:28864", "sasl.mecha
 
 3. Run `uv sync` to install the dependencies. Then do `source .venv/bin/activate`.
 
-4. For easy testing, you can run `fastmcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools.
+4. For easy testing, you can run `mcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools.
 
 ### Environment Variables
 
