@@ -4,10 +4,11 @@ from typing import Sequence
 import timeplus_connect
 from timeplus_connect.driver.binding import quote_identifier, format_query_value
 from dotenv import load_dotenv
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 MCP_SERVER_NAME = "mcp-timeplus"
 from mcp_timeplus.mcp_env import config
+from mcp_timeplus.prompt_template import TEMPLATE
 
 import json, os, time
 from confluent_kafka.admin import (AdminClient)
@@ -127,6 +128,10 @@ def run_sql(query: str):
     except Exception as err:
         logger.error(f"Error executing query: {err}")
         return f"error running query: {err}"
+
+@mcp.prompt()
+def generate_sql(requirements: str) -> str:
+    return f"Please generate Timeplus SQL for the requirement:\n\n{requirements}\n\nMake sure following the guide {TEMPLATE}"
 
 @mcp.tool()
 def list_kafka_topics():
