@@ -7,6 +7,10 @@ An MCP server for Timeplus.
 
 ## Features
 
+### Prompts
+
+* `generate_sql` to give LLM more knowledge about how to query Timeplus via SQL
+
 ### Tools
 
 * `run_sql`
