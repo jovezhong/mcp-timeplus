@@ -27,6 +27,7 @@ deps = [
     "python-dotenv",
     "uvicorn",
     "confluent-kafka",
+    "pip-system-certs",
 ]
 
 mcp = FastMCP(MCP_SERVER_NAME, dependencies=deps)
