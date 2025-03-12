@@ -121,6 +121,7 @@ class TimeplusConfig:
             "verify": self.verify,
             "connect_timeout": self.connect_timeout,
             "send_receive_timeout": self.send_receive_timeout,
+            "client_name": "mcp_clickhouse",
         }
 
         # Add optional database if set
