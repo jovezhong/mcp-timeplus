@@ -119,15 +119,29 @@ def list_tables(database: str = 'default', like: str = None):
 
 @mcp.tool()
 def run_sql(query: str):
+    """Run a query in a Timeplus database"""
     logger.info(f"Executing query: {query}")
-    future = QUERY_EXECUTOR.submit(execute_query, query)
     try:
-        result = future.result(timeout=SELECT_QUERY_TIMEOUT_SECS)
-        return result
-    except concurrent.futures.TimeoutError:
-        logger.warning(f"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds: {query}")
-        future.cancel()
-        return f"Queries taking longer than {SELECT_QUERY_TIMEOUT_SECS} seconds are currently not supported."
+        future = QUERY_EXECUTOR.submit(execute_query, query)
+        try:
+            result = future.result(timeout=SELECT_QUERY_TIMEOUT_SECS)
+            # Check if we received an error structure from execute_query
+            if isinstance(result, dict) and "error" in result:
+                logger.warning(f"Query failed: {result['error']}")
+                # MCP requires structured responses; string error messages can cause
+                # serialization issues leading to BrokenResourceError
+                return {"status": "error", "message": f"Query failed: {result['error']}"}
+            return result
+        except concurrent.futures.TimeoutError:
+            logger.warning(f"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds: {query}")
+            future.cancel()
+            # Return a properly structured response for timeout errors
+            return {"status": "error", "message": f"Query timed out after {SELECT_QUERY_TIMEOUT_SECS} seconds"}
+    except Exception as e:
+        logger.error(f"Unexpected error in run_select_query: {str(e)}")
+        # Catch all other exceptions and return them in a structured format
+        # to prevent MCP serialization failures
+        return {"status": "error", "message": f"Unexpected error: {str(e)}"}
 
     client = create_timeplus_client()
     try:
@@ -144,7 +158,9 @@ def run_sql(query: str):
         return rows
     except Exception as err:
         logger.error(f"Error executing query: {err}")
-        return f"error running query: {err}"
+        # Return a structured dictionary rather than a string to ensure proper serialization
+        # by the MCP protocol. String responses for errors can cause BrokenResourceError.
+        return {"error": str(err)}
 
 @mcp.prompt()
 def generate_sql(requirements: str) -> str:
