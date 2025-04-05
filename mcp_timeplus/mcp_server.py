@@ -41,7 +41,7 @@ mcp = FastMCP(MCP_SERVER_NAME, dependencies=deps)
 
 @mcp.tool()
 def list_databases():
-    """List available ClickHouse databases"""
+    """List available Timeplus databases"""
     logger.info("Listing all databases")
     client = create_timeplus_client()
     result = client.command("SHOW DATABASES")
@@ -51,6 +51,7 @@ def list_databases():
 
 @mcp.tool()
 def list_tables(database: str = 'default', like: str = None):
+    """List available tables/streams in the given database"""
     logger.info(f"Listing tables in database '{database}'")
     client = create_timeplus_client()
     query = f"SHOW STREAMS FROM {quote_identifier(database)}"
@@ -116,6 +117,25 @@ def list_tables(database: str = 'default', like: str = None):
     logger.info(f"Found {len(tables)} tables")
     return tables
 
+def execute_query(query: str):
+    client = create_timeplus_client()
+    try:
+        readonly = 1 if config.readonly else 0
+        res = client.query(query, settings={"readonly": readonly})
+        column_names = res.column_names
+        rows = []
+        for row in res.result_rows:
+            row_dict = {}
+            for i, col_name in enumerate(column_names):
+                row_dict[col_name] = row[i]
+            rows.append(row_dict)
+        logger.info(f"Query returned {len(rows)} rows")
+        return rows
+    except Exception as err:
+        logger.error(f"Error executing query: {err}")
+        # Return a structured dictionary rather than a string to ensure proper serialization
+        # by the MCP protocol. String responses for errors can cause BrokenResourceError.
+        return {"error": str(err)}
 
 @mcp.tool()
 def run_sql(query: str):
@@ -143,24 +163,6 @@ def run_sql(query: str):
         # to prevent MCP serialization failures
         return {"status": "error", "message": f"Unexpected error: {str(e)}"}
 
-    client = create_timeplus_client()
-    try:
-        readonly = 1 if config.readonly else 0
-        res = client.query(query, settings={"readonly": readonly})
-        column_names = res.column_names
-        rows = []
-        for row in res.result_rows:
-            row_dict = {}
-            for i, col_name in enumerate(column_names):
-                row_dict[col_name] = row[i]
-            rows.append(row_dict)
-        logger.info(f"Query returned {len(rows)} rows")
-        return rows
-    except Exception as err:
-        logger.error(f"Error executing query: {err}")
-        # Return a structured dictionary rather than a string to ensure proper serialization
-        # by the MCP protocol. String responses for errors can cause BrokenResourceError.
-        return {"error": str(err)}
 
 @mcp.prompt()
 def generate_sql(requirements: str) -> str:
