@@ -70,8 +70,10 @@ class TestTimeplusTools(unittest.TestCase):
         """Test running a SELECT query with an error."""
         query = f"SELECT * FROM {self.test_db}.non_existent_table"
         result = run_sql(query)
-        self.assertIsInstance(result, str)
-        self.assertIn("error running query", result)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result["status"], "error")
+        self.assertIn("Query failed", result["message"])
+
 
     def test_table_and_column_comments(self):
         """Test that table and column comments are correctly retrieved."""
