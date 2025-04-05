@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: "https://pypi.org/p/mcp-clickhouse"
+      url: "https://pypi.org/p/mcp-timeplus"
     permissions:
       id-token: write
     steps:
