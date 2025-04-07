@@ -7,6 +7,7 @@ from .mcp_server import (
     explore_kafka_topic,
     create_kafka_stream,
     generate_sql,
+    connect_to_apache_iceberg,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "explore_kafka_topic",
     "create_kafka_stream",
     "generate_sql",
+    "connect_to_apache_iceberg",
 ]
