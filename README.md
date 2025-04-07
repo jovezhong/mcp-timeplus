@@ -36,6 +36,10 @@ An MCP server for Timeplus.
   - Setup a streaming ETL in Timeplus to save the Kafka messages locally
   - Input: `topic` (string): The name of the topic.
 
+* `connect_to_apache_iceberg`
+  - Connect to a database based on Apache Iceberg. Currently this is only available via Timeplus Enterprise and it's planned to make it available for Timeplus Proton soon.
+  - Input: `iceberg_db` (string): The name of the Iceberg database. `aws_account_id` (int): The AWS account ID (12 digits). `s3_bucket` (string): The S3 bucket name. `aws_region` (string): The AWS region, default to "us-west-2". `is_s3_table_bucket` (bool): Whether the S3 bucket is a S3 table bucket, default to False.
+
 ## Configuration
 
 First, ensure you have the `uv` executable installed. If not, you can install it by following the instructions [here](https://docs.astral.sh/uv/).
@@ -97,6 +101,8 @@ TIMEPLUS_KAFKA_CONFIG={"bootstrap.servers":"a.aivencloud.com:28864", "sasl.mecha
 3. Run `uv sync` to install the dependencies. Then do `source .venv/bin/activate`.
 
 4. For easy testing, you can run `mcp dev mcp_timeplus/mcp_server.py` to start the MCP server. Click the "Connect" button to connect the UI with the MCP server, then switch to the "Tools" tab to run the available tools.
+
+5. To build the Docker image, run `docker build -t mcp_timeplus .`.
 
 ### Environment Variables
 

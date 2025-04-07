@@ -11,7 +11,7 @@ dependencies = [
     "mcp[cli]>=1.3.0",
     "python-dotenv>=1.0.1",
     "uvicorn>=0.34.0",
-    "timeplus-connect>=0.8.15",
+    "timeplus-connect>=0.8.16",
     "confluent-kafka",
     "pip-system-certs>=4.0",
 ]
