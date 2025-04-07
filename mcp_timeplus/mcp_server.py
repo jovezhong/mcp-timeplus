@@ -99,7 +99,7 @@ def list_tables(database: str = 'default', like: str = None):
             "database": database,
             "name": table,
             "comment": table_comments.get(table),
-            "columns": columns,
+            # "columns": columns, # exclude columns in the output since it's too verbose, the DDL below has enough information
             "create_table_query": create_table_result,
         }
 
