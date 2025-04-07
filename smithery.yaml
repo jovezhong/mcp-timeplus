@@ -1,0 +1,27 @@
+# Smithery.ai configuration
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    {}
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    (config) => ({
+      "command": "uvx",
+      "args": [
+        "mcp-timeplus"
+      ],
+      "env": {
+        "TIMEPLUS_HOST": "localhost",
+        "TIMEPLUS_PORT": "8123",
+        "TIMEPLUS_USER": "default",
+        "TIMEPLUS_PASSWORD": "",
+        "TIMEPLUS_SECURE": "false",
+        "TIMEPLUS_VERIFY": "false",
+        "TIMEPLUS_CONNECT_TIMEOUT": "30",
+        "TIMEPLUS_SEND_RECEIVE_TIMEOUT": "30",
+        "TIMEPLUS_READ_ONLY": "false",
+        "TIMEPLUS_KAFKA_CONFIG": "{\"bootstrap.servers\":\"host:port\", \"sasl.mechanism\":\"SCRAM-SHA-256\",\"sasl.username\":\"admin\", \"sasl.password\":\"password\",\"security.protocol\":\"SASL_SSL\",\"enable.ssl.certificate.verification\":\"false\"}"
+      }
+    })
